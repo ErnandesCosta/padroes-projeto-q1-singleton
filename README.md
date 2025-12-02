@@ -49,3 +49,43 @@ WaitForExit=1
 NoOperation=0
 
 ---
+
+## 🧩 Estrutura da solução
+
+- `ConfigManager.java`  
+  Classe Singleton responsável por:
+  - Ler o arquivo `config.txt` uma única vez.
+  - Armazenar as configurações em um `LinkedHashMap<String, String>` (preserva a ordem do arquivo).
+
+- `Main.java`  
+  Classe principal que:
+  - Obtém a instância única via `ConfigManager.getInstance()`.
+  - Chama `printAll()` para exibir todas as configurações.
+
+- `config.txt`  
+  Arquivo de configuração com pares `chave=valor`, incluindo a linha `WorkingDirectory=` (sem valor), usada para testar o tratamento de campos vazios.
+
+---
+
+## 🧠 Uso de IA e correções manuais
+
+1. **Versão inicial gerada por IA**  
+   - A IA criou `ConfigManager` usando `split("=")` de forma ingênua.  
+   - Essa solução assumia que todas as linhas teriam sempre `chave=valor`.  
+   - Ao ler `WorkingDirectory=`, ocorria `ArrayIndexOutOfBoundsException`.
+
+2. **Cenário de erro com dados reais**  
+   - Foi adicionada uma `Main` e um `config.txt` real.  
+   - Executando o programa, o erro apareceu, evidenciando a limitação da solução da IA.
+
+3. **Ajustes humanos (refatoração)**  
+   - O método `loadConfiguration` foi refatorado para usar `split("=", 2)`, preservando valores vazios.  
+   - Foi adicionada verificação de tamanho do array para não acessar índices inválidos.  
+   - O `LinkedHashMap` passou a ser usado para manter a ordem original das entradas.  
+
+---
+
+## 📚 Prompts utilizados 
+
+- "De acordo com esse enunciado, faça passo a passo e com explicações."
+- "Quero que conserte o texto e deixe na ordem da questão."
