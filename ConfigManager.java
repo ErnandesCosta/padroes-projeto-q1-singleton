@@ -1,22 +1,19 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap; // <--- MUDANÇA 1: Importar LinkedHashMap
 import java.util.Map;
 
 public class ConfigManager {
-    // Instância única da classe (Singleton)
     private static ConfigManager instance;
-    // Armazena as configurações em memória
     private Map<String, String> properties;
 
-    // Construtor privado: impede criação direta de instâncias
     private ConfigManager() {
-        properties = new HashMap<>();
+        // MUDANÇA 2: Usar LinkedHashMap para MANTER A ORDEM do arquivo
+        properties = new LinkedHashMap<>(); 
         loadConfiguration("config.txt");
     }
 
-    // Ponto de acesso global à instância única
     public static ConfigManager getInstance() {
         if (instance == null) {
             instance = new ConfigManager();
@@ -24,26 +21,33 @@ public class ConfigManager {
         return instance;
     }
 
-    // VERSÃO INICIAL GERADA PELA IA
     private void loadConfiguration(String filePath) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // Assume que sempre existe "chave=valor"
-                String[] parts = line.split("=");
-                properties.put(parts[0].trim(), parts[1].trim());
+                if (line.trim().isEmpty()) continue;
+
+                String[] parts = line.split("=", 2);
+                String key = parts[0].trim();
+                String value = "";
+
+                if (parts.length > 1) {
+                    value = parts[1].trim();
+                }
+
+                properties.put(key, value);
             }
-        } catch (Exception e) {
-            // Apenas imprime o erro (vamos usar isso para ver o bug depois)
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Erro ao ler arquivo: " + e.getMessage());
         }
     }
 
     public void printAll() {
         if (properties.isEmpty()) {
-            System.out.println("Nenhuma configuração carregada (pode ter ocorrido erro na leitura).");
+            System.out.println("Erro: Nenhuma configuração carregada.");
         } else {
-            properties.forEach((k, v) -> System.out.println(k + " -> " + v));
+            // Agora vai imprimir na ordem correta
+            properties.forEach((k, v) -> System.out.println(k + "=" + v));
         }
     }
 }
